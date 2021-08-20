@@ -388,4 +388,4 @@ To keep the track of such things, we can add metadata to the @moduledoc . So, we
 @moduledoc authors: ["blackode", "doe"], since: "1.1.2"
 ```
 
-[Prev](part7.md) [Next](part9.md)
+[前一篇](part7.md) [下一篇](part9.md)

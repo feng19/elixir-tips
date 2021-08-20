@@ -340,3 +340,5 @@ In case the default directories are not found then it returns PWD i.e present wo
 ## WARNING
 
 Though you exported **Environmental** variables, it still gives default values if those exported directories are not available.
+
+[前一篇](part8.md) [下一篇](part10.md)

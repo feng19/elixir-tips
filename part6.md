@@ -183,4 +183,4 @@ Thanks for Reading.
 
 If you feel they are useful...
 
-[Prev](part5.md) [Next](part7.md)
+[前一篇](part5.md) [下一篇](part7.md)

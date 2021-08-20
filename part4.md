@@ -1,16 +1,16 @@
 <img class="elixirtip-img" src="assets/images/parts/elixir_tips_4.jpg"/>
 
-## 1. Running Multiple Mix Tasks
+## 1. 一次运行多个 Mix 任务
 
 ```elixir
 mix do deps.get,compile
 ```
 
-You can run multiple tasks by separating them with coma `,`
+运行多个任务的时候，可以通过逗号 `,` 来分割他们。
 
-How ever you can also create aliases in your mix project in a file called `mix.exs` .
+不过你也可以在你的 mix 项目的文件中  `mix.exs` 创建别名。
 
-The project definition looks like the following way when you create one using a `mix` tool.
+当你使用 `mix` 创建的项目一般是下面这样的：
 
 ```elixir
 def project do
@@ -23,9 +23,9 @@ def project do
   end
 ```
 
-You are also allowed to add some extra fields…
+你可以修改其中一些字段。
 
-Here you have to add the `aliases` field.
+像下面这样增加 `aliases` 字段。
 
 ```elixir
 [
@@ -33,9 +33,9 @@ Here you have to add the `aliases` field.
 ]
 ```
 
-Don’t forget to add `,` at the end when you add this in the middle of `list` .
+当你把上面的拷贝到你的文件中是，你是在 `list` 的结构里面修改，记得给上一行的最后加上 `,` 逗号。
 
-The `aliases()` should return the `key-value` list.
+`aliases()` 函数应该返回 `key-value` 列表。
 
 ```elixir
 defp aliases do
@@ -45,9 +45,9 @@ defp aliases do
 end
 ```
 
-So, whenever you run the `mix ecto.setup` the three tasks `ecto.create`, `ecto.migrate` and `ecto.seed` will run one after the other.
+完成上面的步骤之后，每当你执行 `mix ecto.setup` 时，这三个 `ecto.create`， `ecto.migrate` 和 `ecto.seed` 就会一个一个接着被执行。
 
-You can also add them directly as following unlike I did with private function.
+你也可以直接将列表加到 `project` 函数内，并不一定非要放到函数内，就像下面这样：
 
 ```elixir
 def project do
@@ -58,15 +58,13 @@ def project do
   end
 ```
 
-## 2. Accessing the Documentation
+## 2. 获取文档
 
-Elixir stores the documentation inside the `bytecode` in a memory. You access the documentation with the help of `Code.get_docs/2` function . This means, the documentation accessed when it is required, but not when it is loaded in the virtual machine like `iex`
+Elixir 以 `bytecode` 方式存储文档。你可以通过 `Code.fetch_docs/1` 函数获取文档。这就是说，文档仅仅在需要的时候才回去从硬盘中获取，并不是跟随模块加载一起加载到 vm 中的。
 
-Suppose you defined a module in memory like ones you defined in **IEx**, cannot have their documentation accessed as they do not have their bytecode written to disk.
+假设你在 **IEx** 中定义了一个模块，此模块仅仅存在于内存中，并不能获取此模块的文档，因为 `bytecode` 并未写入到硬盘中。
 
-Let us check this…
-
-Create a module with name `test.ex` with the following code. You can copy and paste it.
+让我们开始吧，将下面的代码复制到 `test.ex` 文件中：
 
 ```elixir
 defmodule Test do
@@ -83,13 +81,13 @@ defmodule Test do
 end
 ```
 
-Now stay in the directory where your file exists and run the command
+在同一个目录下运行下面这条命令语句：
 
 ```elixir
 $ iex test.ex
 ```
 
-Now you can access the function definitions but not the documentation.
+但是这样你只能调用函数，并不能获取到文档。
 
 ```elixir
 iex> Test.hello
@@ -97,44 +95,47 @@ hello
 :ok
 ```
 
-That means the code is compiled but documentation is not stored in the memory. So, you cannot access the docs. Lets check that…
+这意味着，代码已经加载了，但是文档并未加载到内存中；所以你无法获取到文档，你可以通过下面的函数试试：
 
 ```elixir
-iex> Code.get_docs Hello, :moduledoc
-nil
+iex> Code.fetch_docs Test
+{:error, :module_not_found}
 ```
 
-You will see the output as `nil` when you are trying to access the **docs** of the module you have created so far. This is because, the `bytecode` is not available in disk. In simple way `beam` file is not present. Lets do that...
+当你尝试范围你创建模块的文档时候，你会发现返回了 `nil` 值。这是因为 `bytecode` 并不存在于硬盘中。简单可以理解为 `beam` 文件不存在导致的，那让我们换种方式看看……
 
-Press `Ctrl+C` twice so you will come out of the shell and this time you run the command as
+退出`iex`控制台然后重新回到`shell`控制台，然后执行下面的命令：
 
 ```elixir
 $ elixirc test.ex
 ```
 
-After running the command, you will see a file with name `Elixir.Test.beam` . Now the `bytecode` for the module `Test` is available in memory. Now you can access the documentation as follows...
+运行过后，你可以在当前目录发现一个文件： `Elixir.Test.beam` 。 现在模块`Test`的 `bytecode` 就能加载到内存中了，然后你就能用下面的函数访问到文档了：
 
 ```elixir
 $ iex
-iex> Code.get_docs Test, :moduledoc
-{3, "This is the test module docs\n"}
+iex> Code.fetch_docs Test
+{:docs_v1, 2, :elixir, "text/markdown",
+ %{"en" => "This is the test module docs\n"}, %{},
+ [
+   {{:function, :hello, 0}, 6, ["hello()"],
+    %{"en" => "This is the documentation of hello function\n"}, %{}}
+ ]}
 ```
 
-The output is tuple with two elements. The first element is the line number of the documentation it starts and second element is the actual documentation in the binary form.
+查看链接了解更多详情： [链接](https://hexdocs.pm/elixir/Code.html#get_docs/2)
 
-You can read more about this function [here](https://hexdocs.pm/elixir/Code.html#get_docs/2)
+## 3. 详细的测试报告
 
-## 3. Verbose Testing
-
-When you go with `mix test` it will run all the tests defined and gives you the time of testing. However, you can see more verbose output like which test you are running with the `--trace` option like following…
+当你运行 `mix test` 时，所有的测试都会执行，最后打印总的耗时时间。 然而，如果你还想看到更加详尽的信息可以在命令行的最后增加  `--trace` 选项，看下面的例子：
 
 ```elixir
 mix test --trace
 ```
 
-It will list out the all tests with names you defined as `test "test_string"` here `test_string` is the name of the test.
+定义 `test "test_string"` 中的 `test_string` 就是这个 test 的名字，上面的结果会打印出所有的名字以及每个测试的消耗用时。
 
-## 4. Dynamic Function Name in Elixir Macro
+## 4. 通过 Elixir 的 宏(Macro) 动态定义函数名
 
 ```elixir
 defmacro gen_function(fun_name) do
@@ -146,22 +147,20 @@ defmacro gen_function(fun_name) do
 end
 ```
 
-To be simple the name of the function should be an **atom** instead of binary.
+简单来说，函数的名字必须是一个 **原子(atom)** 而不是字符串。
 
-## **5. Run Shell Commands in Elixir**
+## **5. 在 Elixir 中运行 Shell 命令**
 
 ```elixir
 System.cmd(command, args, options \\ [])
 ```
 
-Executes the given command with args.
+参数解析：
 
-* **command** is expected to be an executable available in PATH unless an absolute path is given.
-* **args** must be a list of binaries which the executable will receive as its
+* **command** 可执行文件/程序，并且需要在 PATH 中能查找到的，除非提供绝对路径。
+* **args** 必须是一个列表，元素需为字符串，可执行文件/程序会收到这些参数。
 
-  arguments as is. This means that:
-
-### Examples
+### 示例
 
 ```elixir
 iex> System.cmd "echo", ["hello"]
@@ -173,13 +172,13 @@ iex> System.cmd "echo", ["hello"], into: []
     {["hello\n"], 0}
 ```
 
-Get help from `iex` with `h System.cmd`
+可以在 `iex` 中输入 `h System.cmd` 查看帮组文档
 
-Checkout the documentation about `System` for more information and also check [Erlang os Module](http://www.erlang.org/doc/man/os.html).
+可以去查看 `System` 的文档，或者 [Erlang os Module](http://www.erlang.org/doc/man/os.html)
 
-## 6. Printing List as List without ASCII-Encoding
+## 6. 打印 列表(List) 时不转换 ASCII 编码
 
-You know that when the list contains all the numbers as **ASCII** values, it will list out those values instead of the original numbers. Lets check that…
+如果列表中所有的数字都在 **ASCII** 编码表范围内的话，输出时会自动将数字对应的字符打印出来，如下面的例子：
 
 ```elixir
 iex> IO.inspect [97, 98]
@@ -187,7 +186,7 @@ iex> IO.inspect [97, 98]
 'ab'
 ```
 
-The code point of `a` is `97` and `b` is `98` hence it is listing out them as `char_list`. However you can tell the `IO.inspect` to list them as list itself with option `char_lists: :as_list` .
+字符  `a` 的编码是 `97` ，字符 `b` 是 `98` ，因此就以 `字符列表` 形式输出。尽管如此，你可以给 `IO.inspect` 设置 `char_lists: :as_list` 参数来避免。
 
 ```elixir
 iex> IO.inspect [97, 98], charlists: :as_lists
@@ -195,15 +194,15 @@ iex> IO.inspect [97, 98], charlists: :as_lists
 'ab'
 ```
 
-Open `iex` and type `h Inspect.Opts`, you will see that Elixir does this kind of thing with other values as well, specifically **structs** and **binaries**.
+打开 `iex` 然后输入 `h Inspect.Opts`, 你会发现 Elixir 其它类型的数据时依然有效，特别是 **structs** 和 **binaries**。
 
-## 7. Accessing file name and line number etc…
+## 7. 获取当前文件名/行号等等
 
 ```elixir
 defmacro __ENV__()
 ```
 
-This macro gives the current environment information. You can get the information like current `filename` `line` `function` and others…
+这个宏包含了当前环境信息。你可以从中拿到当前的文件名/行号/函数名等等
 
 ```elixir
 iex(4)> __ENV__.file
@@ -213,13 +212,13 @@ iex(5)> __ENV__.line
 5
 ```
 
-## 8. Creating Manual Pids
+## 8. 手动创建 Pids
 
-You can create the pid manually in Elixir with `pid` function. This comes with two flavors.
+在Elixir中你可以用`pid` 函数手动创建 pid ，函数支持两种方式。
 
 ### def pid\(string\)
 
-Creates the pid from the string.
+用字符串创建 **PID** ：
 
 ```elixir
 iex> pid("0.21.32")
@@ -228,39 +227,39 @@ iex> pid("0.21.32")
 
 ### def pid\(a, b, c\)
 
-Creates a **PID** with 3 non negative integers passed as arguments to the function.
+通过三个正整数来创建 **PID** ：
 
 ```elixir
 iex> pid(0, 21, 32)
 #PID<0.21.32>
 ```
 
-### Why do you create the pids manually?
+### 为什么需要手动去创建 pids ？
 
-Suppose you are writing a library and you want to test one of your functions for the type pid, then you can create one and test over it.
+假设你正在开发一个库的一个函数，该函数的需要一个 pid 的入参，你想测试函数是，就需要手动创建一个 pid 。
 
-You cannot create the pid like assigning `pid = #PID<0.21.32>` because `#` is considered as comment here.
+你不能通过这样 `pid = #PID<0.21.32>` 来创建，因为 `#` 是注释符。
 
 ```elixir
 iex(6)> pid = #PID<0.21.32>
 ...(6)>
 ```
 
-When you do like above, **iex** shell just wait for more input as `#PID<0.21.32>` is treated as comment.
+像上面那样， **iex** 还在等待更多输入，因为 `#PID<0.21.32>` 已经被当成了注释。
 
-Now you enter another data to complete the expression. The entered value is the value of the pid. Lets check that…
+所以你只能通过其他数据来完结这个表达式。你可以试试看：
 
 ```elixir
-iex(6)> pid = #PID<0.21.32>      # here expression is not complete
-...(6)> 23    # here we are giving the value 23
-23            # expression is complete
+iex(6)> pid = #PID<0.21.32>      # 表达式未完成
+...(6)> 23    # 输入 23
+23            # 表达式已完成
 iex(7)> pid
 23
 ```
 
-## 9. Replacing the String with global option
+## 9. 字符串替换时的 global 参数
 
-The `String.replace` function will replace the given the pattern with replacing pattern. By default, it replaces all the occurrences of the pattern. Lets check that…
+`String.replace` 方法可以将某些字符串替换为其他字符串。默认情况下，它会替换掉所有出现的字符串。看下面的示例：
 
 ```elixir
 iex(1)> str = "hello@hi.com, blackode@medium.com"    
@@ -270,20 +269,20 @@ iex(2)> String.replace str,"@","#"
 "hello#hi.com, blackode#medium.com
 ```
 
-The `String.replace str, "@", "#"`is same as `String.replace str, "@", "#", global: true`
+`String.replace str, "@", "#" 相当于 `String.replace str, "@", "#", global: true`
 
-But, if you want to replace only the first occurrence of the pattern, you need to pass the option `global: false` . So, it replaces only the first occurrence of `@` . Lets check that…
+但是，当你只需要替换第一个字符串时，你可以通过指定 `global: false` 参数来实现。所以下面例子中的 `@` 只会被替换一次：
 
 ```elixir
 iex(3)> String.replace str, "@", "#", global: false
 "hello#hi.com, blackode@medium.com"
 ```
 
-Here only first `@` is replaced with `#`.
+只有一个 `@` 被替换为 `#`。
 
-## 10.Memory Usage
+## 10. 内存使用情况
 
-You can check the memory usage \(in bytes\) with `:erlang.memory`
+你可以通过 `:erlang.memory` 获取当前内存使用(单位 bytes)情况。
 
 ```elixir
 iex(1)> :erlang.memory
@@ -291,11 +290,11 @@ iex(1)> :erlang.memory
  atom: 264529, atom_used: 250685, binary: 151192, code: 5845369, ets: 331768]
 ```
 
-However, you can pass option like `:erlang.memory :atom` to get the memory usage of atoms.
+另外，你还可以通过给定参数来访问 `:erlang.memory :atom`  获取 atoms 的内存使用情况。
 
 ```elixir
 iex(2)> :erlang.memory :atom
 264529
 ```
 
-[Prev](part3.md) [Next](part5.md)
+[前一篇](part3.md) [下一篇](part5.md)

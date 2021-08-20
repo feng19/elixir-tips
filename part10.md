@@ -318,5 +318,5 @@ The above examples are directly copied from original documentation.
 
 Read More about [Elixir V 1.10](https://elixir-lang.org/blog/2020/01/27/elixir-v1-10-0-released/)
 
-
+[前一篇](part9.md) 
 

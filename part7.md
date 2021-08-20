@@ -411,4 +411,4 @@ In general, with out using `alias __MODULE__` , we have to type full module name
 
 ## Happy Coding!
 
-[Prev](part6.md) [Next](part8.md)
+[前一篇](part6.md) [下一篇](part8.md)

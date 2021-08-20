@@ -58,7 +58,7 @@ You can read specific parts with following links...
  </div>
 
  All Photos by [Form](https://unsplash.com/@theformfitness) on [Unsplash](https://unsplash.com)
- 
+
  Checkout some cherry picked tips from the all Parts
 
 # Taste Before you Eat :)
